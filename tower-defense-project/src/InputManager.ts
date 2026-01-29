@@ -2,6 +2,7 @@ export default class InputManager {
     private x: number = 0;
     private y: number = 0;
     private isMouseDown: boolean = false;
+    private isMouseClicked: boolean = false;
     private keyPressed: string = '';
 
     constructor(canvas: HTMLCanvasElement) {
@@ -12,11 +13,12 @@ export default class InputManager {
             this.y = e.clientY - rect.top;
         });
 
-        addEventListener('pointerdown', () => {
+        canvas.addEventListener('pointerdown', () => {
             this.isMouseDown = true;
+            this.isMouseClicked = true;
         });
 
-        addEventListener('pointerup', () => {
+        window.addEventListener('pointerup', () => {
             this.isMouseDown = false;
         });
 
@@ -35,6 +37,12 @@ export default class InputManager {
 
     getMouseDown(): boolean {
         return this.isMouseDown;
+    }
+
+    getMouseClicked(): boolean {
+        const wasClicked = this.isMouseClicked;
+        this.isMouseClicked = false;
+        return wasClicked;
     }
 
     getKeyPressed(): string {

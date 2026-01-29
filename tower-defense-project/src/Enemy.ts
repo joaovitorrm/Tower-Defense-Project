@@ -3,39 +3,51 @@ import type { Position } from "./utils";
 
 type direction = 'left' | 'right' | 'up' | 'down';
 
+const directions: direction[] = ['left', 'right', 'up', 'down'];
+const oppositeDirections: { [key in direction]: direction } = {
+    'left': 'right',
+    'right': 'left',
+    'up': 'down',
+    'down': 'up'
+};
+
 export abstract class Enemy {
-     constructor(
+
+    protected hasColided: boolean = false;
+
+    constructor(
+        public x: number,
+        public y: number,
         public health: number,
         public speed: number,
         public direction: direction,
-        public x: number,
-        public y: number
-     ) {}
+        protected collisions: boolean[][] = []
+    ) { }
+
+    abstract draw(ctx: CanvasRenderingContext2D): void;
+    abstract update(deltaTime: number): void;
 }
 
 export class BasicEnemy extends Enemy {
 
-    collisions : boolean[][] = [];
-    hasColided: boolean = false;
+    private radius: number = 15;
 
-    constructor(x: number, y: number, direction: direction) {
-        super(100, 50, direction, x, y);
+    constructor(x: number, y: number, health: number, speed: number, radius: number, direction: direction, collisionMap: boolean[][]) {
+        super(x, y + radius + 5, health, speed, direction, collisionMap);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
         ctx.fillStyle = 'red';
         ctx.beginPath();
-        ctx.arc(this.x, this.y, 15, 0, Math.PI * 2);
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();
-    }
-
-    setCollisions(collisionMap: boolean[][]): void {
-        this.collisions = collisionMap;
     }
 
     update(deltaTime: number): void {
 
-        if (this.hasColided) return;
+        if (!this.checkCollision()) {
+            this.changeDirection();
+        };
 
         switch (this.direction) {
             case 'left':
@@ -53,23 +65,47 @@ export class BasicEnemy extends Enemy {
         }
     }
 
-    checkCollision(): boolean {
+    checkCollision(dir?: direction): boolean {
+
+        const tileSize = 40;
+
+        const gap = this.radius + (this.radius / 2);
 
         let x = this.x;
         let y = this.y;
 
-        if (this.direction === 'left') {
-            x -=  15;
-        } else if (this.direction === 'right') {
-            x += 15;
-        } else if (this.direction === 'up') {
-            y -= 15;
-        } else if (this.direction === 'down') {
-            y += 15;
+        dir = dir || this.direction;
+
+        switch (dir) {
+            case 'left':
+                x -= gap;
+                break;
+            case 'right':
+                x += gap;
+                break;
+            case 'up':
+                y -= gap;
+                break;
+            case 'down':
+                y += gap;
+                break;
         }
 
-        const tileX = x % 40;
-        const tileY = y % 40;
-        return this.collisions[tileX][tileY];
+        const tileX = Math.floor(x / tileSize);
+        const tileY = Math.floor(y / tileSize);
+
+        return !!this.collisions[tileY]?.[tileX];
+    }
+
+    changeDirection(): void {
+        const actualDirection = this.direction;
+        for (const dir of directions) {
+            if (dir !== actualDirection && dir !== oppositeDirections[actualDirection]) {
+                if (this.checkCollision(dir)) {
+                    this.direction = dir;
+                    break;
+                }
+            }
+        }
     }
 }

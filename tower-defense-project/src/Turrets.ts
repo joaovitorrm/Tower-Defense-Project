@@ -4,6 +4,7 @@ export abstract class Turret {
     public cooldown: number = 0;
     public showRange: boolean = true;
     public target: Position | null = null;
+    public shoots: VectorA[] = [];
 
     constructor(
         public range: number,
