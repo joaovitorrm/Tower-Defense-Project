@@ -38,14 +38,13 @@ export default class Game {
     }
 
     loadUi(): void {
-        const panelRect = new Rect(10, 350, 150, 200);
+        const panelRect = new Rect(10, 390, 150, 200);
         // Add buttons for turrets
         const basicTurretButton = new LabelButton(
             new Rect(10, 10, 130, 30),
             panelRect,
             () => {
                 this.placingTurret = new BasicTurret(0, 0);
-                this.placingTurret.showRange = this.rangeVisible;
             },
             "Basic Turret"
         );
@@ -55,7 +54,6 @@ export default class Game {
             panelRect,
             () => {
                 this.placingTurret = new RapidFireTurret(0, 0);
-                this.placingTurret.showRange = this.rangeVisible;
             },
             "Rapid Fire Turret"
         );
@@ -65,21 +63,22 @@ export default class Game {
             panelRect,
             () => {
                 this.placingTurret = new SniperTurret(0, 0);
-                this.placingTurret.showRange = this.rangeVisible;
             },
             "Sniper Turret"
         );
 
         const toggleRangeButton = new ToggleButton(
-            new Rect(10, 130, 30, 30),
+            new Rect(10, 155, 30, 30),
             panelRect,
             (state: boolean) => {
                 this.changeRangeVisibility(state);
-            }
+            },
+            this.rangeVisible
         )
+        
 
         const labelToggleButton = new Label(
-            new Rect(45, 135, 90, 30), panelRect, "Show Range"
+            new Rect(45, 160, 90, 30), panelRect, "Show Range"
         )
 
         const panel = new Panel(panelRect);
@@ -132,7 +131,7 @@ export default class Game {
 
             turret.shoots.forEach((shoot, index) => {
                 this.enemies = this.enemies.filter(enemy => {
-                    if (distance({ x: shoot.vector.x, y: shoot.vector.y }, { x: enemy.x, y: enemy.y }) < 10) {
+                    if (distance({ x: shoot.vector.x, y: shoot.vector.y }, { x: enemy.x, y: enemy.y }) < (shoot.radius + enemy.radius)) {
                         turret.shoots.splice(index, 1);
                         enemy.health -= turret.damage;
                         if (enemy.health <= 0) {
@@ -172,7 +171,8 @@ export default class Game {
 
         if (this.input.getMouseClicked()) {
             if (this.placingTurret !== null) {
-                this.turrets.push(this.placingTurret);
+                this.placingTurret.showRange = this.rangeVisible;
+                this.turrets.push(this.placingTurret);                
                 this.placingTurret = null;
             }
         }

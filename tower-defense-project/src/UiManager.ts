@@ -76,10 +76,9 @@ export class LabelButton extends Button {
     }
 }
 
-export class ToggleButton extends Button {
-    private toggled: boolean = false;
+export class ToggleButton extends Button {    
 
-    constructor(rect: Rect, parent: Rect | null = null, private onToggle: (state: boolean) => void) {
+    constructor(rect: Rect, parent: Rect | null = null, private onToggle: (state: boolean) => void, private toggled: boolean = false) {
         super(rect, parent, () => {
             this.toggled = !this.toggled;
             this.onToggle(this.toggled);

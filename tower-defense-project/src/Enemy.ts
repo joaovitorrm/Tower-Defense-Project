@@ -1,6 +1,4 @@
 import { SETTINGS } from "./Settings";
-import type { Position } from "./utils";
-
 
 type direction = 'left' | 'right' | 'up' | 'down';
 
@@ -22,6 +20,7 @@ export abstract class Enemy {
         public health: number,
         public speed: number,
         public direction: direction,
+        public radius: number = 15,
         protected collisions: boolean[][] = []
     ) { }
 
@@ -31,10 +30,8 @@ export abstract class Enemy {
 
 export class BasicEnemy extends Enemy {
 
-    private radius: number = 15;
-
     constructor(x: number, y: number, health: number, speed: number, radius: number, direction: direction, collisionMap: boolean[][]) {
-        super(x, y + radius + 5, health, speed, direction, collisionMap);
+        super(x, y + radius + 5, health, speed, direction, radius, collisionMap);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {

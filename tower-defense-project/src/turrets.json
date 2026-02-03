@@ -4,7 +4,7 @@
         "damage": 25,
         "fireRate": 1.5,
         "shootSpeed": 8,
-        "bulletRadius": 10,
+        "bulletRadius": 8,
         "cost": 100
     },
     "RapidFireTurret": {
@@ -19,8 +19,8 @@
         "range": 400,
         "damage": 50,
         "fireRate": 0.5,
-        "shootSpeed": 20,
-        "bulletRadius": 15,
+        "shootSpeed": 18,
+        "bulletRadius": 10,
         "cost": 300
     }
 }
