@@ -2,6 +2,19 @@ export class Position {
     constructor(public x: number, public y: number) {}
 }
 
+export class Rect {
+    constructor(public x: number, public y: number, public width: number, public height: number) {}
+
+    collidesWith(other: Rect): boolean {
+        return !(
+            this.x + this.width < other.x ||
+            this.x > other.x + other.width ||
+            this.y + this.height < other.y ||
+            this.y > other.y + other.height
+        );
+    }
+}
+
 export class VectorA {
   constructor(public x: number, public y: number, public a: number) {}
 

@@ -1,4 +1,5 @@
 import { levels } from "./maps/levels";
+import { SETTINGS } from "./Settings";
 
 const tiles = {
     "#": "grey",
@@ -10,7 +11,7 @@ const tiles = {
 
 export default class MapManager {
     private level: number = 0;
-    private tileSize: number = 40;
+    private tileSize: number = SETTINGS.TILE_SIZE;
     private map: any;
     private collisionMap: boolean[][] = [];
     private spawnPoint: {x: number, y: number} | null = null;

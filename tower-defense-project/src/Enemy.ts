@@ -1,3 +1,4 @@
+import { SETTINGS } from "./Settings";
 import type { Position } from "./utils";
 
 
@@ -67,7 +68,7 @@ export class BasicEnemy extends Enemy {
 
     checkCollision(dir?: direction): boolean {
 
-        const tileSize = 40;
+        const tileSize = SETTINGS.TILE_SIZE;
 
         const gap = this.radius + (this.radius / 2);
 

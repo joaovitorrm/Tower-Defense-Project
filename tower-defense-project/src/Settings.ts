@@ -1,0 +1,7 @@
+export const SETTINGS = {
+    CANVAS_WIDTH: 800,
+    CANVAS_HEIGHT: 600,
+    TILE_SIZE: 40,
+    INITIAL_MONEY: 100,
+    INITIAL_LIVES: 10,
+};

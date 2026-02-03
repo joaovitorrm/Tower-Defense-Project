@@ -27,7 +27,7 @@ export class BasicTurret extends Turret {
     shoots: VectorA[] = [];
 
     constructor(x: number, y: number) {
-        super(120, 10, 1, 5, x, y);
+        super(120, 10, 1, 10, x, y);
     }
 
     shoot(target: Position): void {
@@ -88,7 +88,7 @@ export class SniperTurret extends Turret {
     shoots : VectorA[] = [];
 
     constructor(x: number, y: number) {
-        super(300, 50, 0.5, 10, x, y);
+        super(300, 50, 0.5, 18, x, y);
     }
 
     shoot(target: Position): void {
@@ -97,16 +97,16 @@ export class SniperTurret extends Turret {
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
-        ctx.fillStyle = 'green';
+        ctx.fillStyle = 'black';
         ctx.beginPath();
         ctx.arc(this.x, this.y, 30, 0, Math.PI * 2);
         ctx.fill();
         if (this.showRange) {
-            ctx.strokeStyle = 'rgba(0, 255, 0, 0.3)';
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2);
             ctx.stroke();
-            ctx.fillStyle = 'rgba(0, 255, 0, 0.1)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
             ctx.fill();
         }
 
