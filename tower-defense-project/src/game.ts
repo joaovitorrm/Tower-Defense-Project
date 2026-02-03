@@ -6,12 +6,14 @@ import { distance, Position, Rect } from "./utils";
 
 import { SETTINGS } from "./Settings";
 import type UiManager from "./UiManager";
-import { Button, Panel } from "./UiManager";
+import { Button, Label, LabelButton, Panel, ToggleButton } from "./UiManager";
 
 export default class Game {
 
     turrets: Turret[] = [];
     enemies: Enemy[] = [];
+
+    private rangeVisible: boolean = true;
 
     placingTurret: null | Turret = null;
 
@@ -21,48 +23,77 @@ export default class Game {
         const spawnPoint = map.getSpawnPoint();
 
         if (spawnPoint) {
-            this.enemies.push(new BasicEnemy(spawnPoint.x, spawnPoint.y, 20, 50, 15, 'down', map.getCollisionMap()));
+            this.enemies.push(new BasicEnemy(spawnPoint.x, spawnPoint.y, 200, 50, 15, 'down', map.getCollisionMap()));
             setInterval(() => {
-                this.enemies.push(new BasicEnemy(spawnPoint.x, spawnPoint.y, 20, 50, 15, 'down', map.getCollisionMap()));
+                this.enemies.push(new BasicEnemy(spawnPoint.x, spawnPoint.y, 200, 50, 15, 'down', map.getCollisionMap()));
             }, 1000);
         }
+    }
+
+    changeRangeVisibility(state: boolean): void {
+        this.rangeVisible = state;
+        this.turrets.forEach(turret => {
+            turret.showRange = this.rangeVisible;
+        });
     }
 
     loadUi(): void {
         const panelRect = new Rect(10, 350, 150, 200);
         // Add buttons for turrets
-        const basicTurretButton = new Button(
+        const basicTurretButton = new LabelButton(
             new Rect(10, 10, 130, 30),
             panelRect,
             () => {
                 this.placingTurret = new BasicTurret(0, 0);
-            }
+                this.placingTurret.showRange = this.rangeVisible;
+            },
+            "Basic Turret"
         );
 
-        const rapidFireTurretButton = new Button(
+        const rapidFireTurretButton = new LabelButton(
             new Rect(10, 50, 130, 30),
             panelRect,
             () => {
                 this.placingTurret = new RapidFireTurret(0, 0);
-            }
+                this.placingTurret.showRange = this.rangeVisible;
+            },
+            "Rapid Fire Turret"
         );
 
-        const sniperTurretButton = new Button(
+        const sniperTurretButton = new LabelButton(
             new Rect(10, 90, 130, 30),
             panelRect,
             () => {
                 this.placingTurret = new SniperTurret(0, 0);
-            }
+                this.placingTurret.showRange = this.rangeVisible;
+            },
+            "Sniper Turret"
         );
+
+        const toggleRangeButton = new ToggleButton(
+            new Rect(10, 130, 30, 30),
+            panelRect,
+            (state: boolean) => {
+                this.changeRangeVisibility(state);
+            }
+        )
+
+        const labelToggleButton = new Label(
+            new Rect(45, 135, 90, 30), panelRect, "Show Range"
+        )
 
         const panel = new Panel(panelRect);
         this.uiManager.addElement(panel);
         this.uiManager.addElement(basicTurretButton);
         this.uiManager.addElement(rapidFireTurretButton);
         this.uiManager.addElement(sniperTurretButton);
+        this.uiManager.addElement(toggleRangeButton);
+        this.uiManager.addElement(labelToggleButton);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
+
+        ctx.clearRect(0, 0, SETTINGS.CANVAS_WIDTH, SETTINGS.CANVAS_HEIGHT);
 
         this.map.draw(ctx);
 
@@ -101,7 +132,7 @@ export default class Game {
 
             turret.shoots.forEach((shoot, index) => {
                 this.enemies = this.enemies.filter(enemy => {
-                    if (distance({ x: shoot.x, y: shoot.y }, { x: enemy.x, y: enemy.y }) < 10) {
+                    if (distance({ x: shoot.vector.x, y: shoot.vector.y }, { x: enemy.x, y: enemy.y }) < 10) {
                         turret.shoots.splice(index, 1);
                         enemy.health -= turret.damage;
                         if (enemy.health <= 0) {

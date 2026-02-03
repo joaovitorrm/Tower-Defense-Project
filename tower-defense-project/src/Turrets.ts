@@ -1,10 +1,12 @@
 import { angleBetween, Position, VectorA } from "./utils";
 
+import Turrets from "./turrets.json" assert { type: "json" };
+
 export abstract class Turret {
     public cooldown: number = 0;
     public showRange: boolean = true;
     public target: Position | null = null;
-    public shoots: VectorA[] = [];
+    public shoots: Bullet[] = [];
 
     constructor(
         public range: number,
@@ -22,17 +24,41 @@ export abstract class Turret {
     abstract update(deltaTime: number): void;
 }
 
+class Bullet {
+    constructor(
+        public vector: VectorA,
+        public speed: number,
+        public radius: number,
+        public damage: number
+    ) { }
+
+    update(deltaTime: number): void {
+        this.vector.x += Math.cos(this.vector.a) * this.speed * deltaTime * 100;
+        this.vector.y += Math.sin(this.vector.a) * this.speed * deltaTime * 100;
+    }
+
+    draw(ctx: CanvasRenderingContext2D): void {
+        ctx.fillStyle = 'black';
+        ctx.beginPath();
+        ctx.arc(this.vector.x, this.vector.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
 export class BasicTurret extends Turret {
 
-    shoots: VectorA[] = [];
+    shoots: Bullet[] = [];
 
     constructor(x: number, y: number) {
-        super(120, 10, 1, 10, x, y);
+
+        const data = Turrets["BasicTurret"];
+
+        super(data.range, data.damage, data.fireRate, data.shootSpeed, x, y);
     }
 
     shoot(target: Position): void {
         const angle = angleBetween({ x: this.x, y: this.y }, target);
-        this.shoots.push(new VectorA(this.x, this.y, angle));
+        this.shoots.push(new Bullet(new VectorA(this.x, this.y, angle), Turrets["BasicTurret"].shootSpeed, Turrets["BasicTurret"].bulletRadius, this.damage));
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -50,12 +76,7 @@ export class BasicTurret extends Turret {
             ctx.fill();
         }
 
-        this.shoots.forEach(shoot => {
-            ctx.fillStyle = 'red';
-            ctx.beginPath();
-            ctx.arc(shoot.x, shoot.y, 5, 0, Math.PI * 2);
-            ctx.fill();
-        });
+        this.shoots.forEach(shoot => shoot.draw(ctx));
     }
 
     update(deltaTime: number): void {
@@ -69,10 +90,10 @@ export class BasicTurret extends Turret {
         }
 
         this.shoots.forEach((shoot, index) => {
-            shoot.accelerate(this.speed, 1);
+            shoot.update(deltaTime);
 
             // Remove shoot if it goes out of bounds (for simplicity, assuming canvas size 800x600)
-            if (shoot.x < 0 || shoot.x > 800 || shoot.y < 0 || shoot.y > 600) {
+            if (shoot.vector.x < 0 || shoot.vector.x > 800 || shoot.vector.y < 0 || shoot.vector.y > 600) {
                 this.shoots.splice(index, 1);
             }
         });
@@ -85,15 +106,18 @@ export class BasicTurret extends Turret {
 
 export class SniperTurret extends Turret {
 
-    shoots : VectorA[] = [];
+    shoots : Bullet[] = [];
 
     constructor(x: number, y: number) {
-        super(300, 50, 0.5, 18, x, y);
+
+        const data = Turrets["SniperTurret"];
+
+        super(data.range, data.damage, data.fireRate, data.shootSpeed, x, y);
     }
 
     shoot(target: Position): void {
         const angle = angleBetween({ x: this.x, y: this.y }, target);
-        this.shoots.push(new VectorA(this.x, this.y, angle));
+        this.shoots.push(new Bullet(new VectorA(this.x, this.y, angle), Turrets["SniperTurret"].shootSpeed, Turrets["SniperTurret"].bulletRadius, this.damage));
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -110,12 +134,7 @@ export class SniperTurret extends Turret {
             ctx.fill();
         }
 
-        this.shoots.forEach(shoot => {
-            ctx.fillStyle = 'red';
-            ctx.beginPath();
-            ctx.arc(shoot.x, shoot.y, 5, 0, Math.PI * 2);
-            ctx.fill();
-        });
+        this.shoots.forEach(shoot => shoot.draw(ctx));
     }
 
     update(deltaTime: number): void {
@@ -129,10 +148,10 @@ export class SniperTurret extends Turret {
         }
 
         this.shoots.forEach((shoot, index) => {
-            shoot.accelerate(this.speed, 1);
+            shoot.update(deltaTime);
 
             // Remove shoot if it goes out of bounds (for simplicity, assuming canvas size 800x600)
-            if (shoot.x < 0 || shoot.x > 800 || shoot.y < 0 || shoot.y > 600) {
+            if (shoot.vector.x < 0 || shoot.vector.x > 800 || shoot.vector.y < 0 || shoot.vector.y > 600) {
                 this.shoots.splice(index, 1);
             }
         });
@@ -141,15 +160,18 @@ export class SniperTurret extends Turret {
 
 export class RapidFireTurret extends Turret {
     
-    shoots : VectorA[] = [];
+    shoots : Bullet[] = [];
 
     constructor(x: number, y: number) {
-        super(90, 1, 5, 8, x, y);
+
+        const data = Turrets["RapidFireTurret"];
+
+        super(data.range, data.damage, data.fireRate, data.shootSpeed, x, y);
     }
 
     shoot(target: Position): void {
         const angle = angleBetween({ x: this.x, y: this.y }, target);
-        this.shoots.push(new VectorA(this.x, this.y, angle));
+        this.shoots.push(new Bullet(new VectorA(this.x, this.y, angle), Turrets["RapidFireTurret"].shootSpeed, Turrets["RapidFireTurret"].bulletRadius, this.damage));
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -166,12 +188,7 @@ export class RapidFireTurret extends Turret {
             ctx.fill();
         }
 
-        this.shoots.forEach(shoot => {
-            ctx.fillStyle = 'red';
-            ctx.beginPath();
-            ctx.arc(shoot.x, shoot.y, 5, 0, Math.PI * 2);
-            ctx.fill();
-        });
+        this.shoots.forEach(shoot => shoot.draw(ctx));
     }
 
     update(deltaTime: number): void {
@@ -185,10 +202,10 @@ export class RapidFireTurret extends Turret {
         }
 
         this.shoots.forEach((shoot, index) => {
-            shoot.accelerate(this.speed, 1);
+            shoot.update(deltaTime);
 
             // Remove shoot if it goes out of bounds (for simplicity, assuming canvas size 800x600)
-            if (shoot.x < 0 || shoot.x > 800 || shoot.y < 0 || shoot.y > 600) {
+            if (shoot.vector.x < 0 || shoot.vector.x > 800 || shoot.vector.y < 0 || shoot.vector.y > 600) {
                 this.shoots.splice(index, 1);
             }
         });

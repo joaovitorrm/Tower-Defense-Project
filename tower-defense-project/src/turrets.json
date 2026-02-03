@@ -1,0 +1,26 @@
+{
+    "BasicTurret": {
+        "range": 180,
+        "damage": 25,
+        "fireRate": 1.5,
+        "shootSpeed": 8,
+        "bulletRadius": 10,
+        "cost": 100
+    },
+    "RapidFireTurret": {
+        "range": 100,
+        "damage": 10,
+        "fireRate": 4,
+        "shootSpeed": 15,
+        "bulletRadius": 5,
+        "cost": 150
+    },
+    "SniperTurret": {
+        "range": 400,
+        "damage": 50,
+        "fireRate": 0.5,
+        "shootSpeed": 20,
+        "bulletRadius": 15,
+        "cost": 300
+    }
+}

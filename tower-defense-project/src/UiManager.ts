@@ -62,6 +62,37 @@ export class Button extends UiElement {
 
 }
 
+export class LabelButton extends Button {
+    constructor(rect: Rect, parent: Rect | null = null, onClick: () => void, private label: string) {
+        super(rect, parent, onClick);
+    }
+
+    draw(ctx: CanvasRenderingContext2D): void {
+        super.draw(ctx);
+        const pos = this.getAbsolutePosition();
+        ctx.fillStyle = 'black';
+        ctx.font = '16px Arial';
+        ctx.fillText(this.label, pos.x + 10, pos.y + this.rect.height / 2 + 6);
+    }
+}
+
+export class ToggleButton extends Button {
+    private toggled: boolean = false;
+
+    constructor(rect: Rect, parent: Rect | null = null, private onToggle: (state: boolean) => void) {
+        super(rect, parent, () => {
+            this.toggled = !this.toggled;
+            this.onToggle(this.toggled);
+        });
+    }
+
+    draw(ctx: CanvasRenderingContext2D): void {
+        const pos = this.getAbsolutePosition();
+        ctx.fillStyle = this.toggled ? 'green' : 'red';
+        ctx.fillRect(pos.x, pos.y, this.rect.width, this.rect.height);
+    }
+}
+
 export class Panel extends UiElement {
     constructor(rect: Rect, parent: Rect | null = null) {
         super(rect, parent);

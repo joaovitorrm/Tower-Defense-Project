@@ -18,11 +18,16 @@ if (context) {
   const uiManager = new UiManager();
   const game = new Game(inputManager, mapManager, uiManager);
 
+  let lastTime = performance.now();
+
   const gameLoop = () => {
-    context.clearRect(0, 0, gameCanvas.width, gameCanvas.height);
+
+    const currentTime = performance.now();
+    const deltaTime = (currentTime - lastTime) / 1000; // Convert to seconds
+    lastTime = currentTime;
 
     game.draw(context);
-    game.update(1 / 60);
+    game.update(deltaTime);
 
     requestAnimationFrame(gameLoop);
   }
