@@ -19,12 +19,19 @@
     "enemyWaves": [
         {
             "enemies": [
-                { "type": "basic", "spawnAmount": 10, "spawnInterval": 1}
+                { "type": "basic", "spawnAmount": 2, "spawnInterval": 1},
+                { "type": "fast", "spawnAmount": 10, "spawnInterval": 0.5 }
             ]
         },
         {
             "enemies": [
                 { "type": "basic", "spawnAmount": 15, "spawnInterval": 0.8 }                
+            ]
+        },
+        {
+            "enemies": [
+                { "type": "basic", "spawnAmount": 20, "spawnInterval": 0.5 },
+                { "type": "fast", "spawnAmount": 10, "spawnInterval": 1 }
             ]
         }
     ]

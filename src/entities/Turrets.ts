@@ -106,7 +106,7 @@ export class BasicTurret extends Turret {
 
 export class SniperTurret extends Turret {
 
-    shoots : Bullet[] = [];
+    shoots: Bullet[] = [];
 
     constructor(x: number, y: number) {
         const data = Turrets["SniperTurret"];
@@ -157,8 +157,8 @@ export class SniperTurret extends Turret {
 }
 
 export class RapidFireTurret extends Turret {
-    
-    shoots : Bullet[] = [];
+
+    shoots: Bullet[] = [];
 
     constructor(x: number, y: number) {
         const data = Turrets["RapidFireTurret"];
@@ -206,4 +206,10 @@ export class RapidFireTurret extends Turret {
             }
         });
     }
+}
+
+export const TurretsTypes = {
+    "BasicTurret": BasicTurret,
+    "SniperTurret": SniperTurret,
+    "RapidFireTurret": RapidFireTurret
 }

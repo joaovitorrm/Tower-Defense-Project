@@ -1,4 +1,8 @@
+import type { Turret } from "./Turrets";
+
 export default class Player {
+
+    public placingTurret: Turret | null = null;
 
     constructor(private money: number, private lives: number) {}
 

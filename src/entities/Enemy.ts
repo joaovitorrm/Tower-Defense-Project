@@ -26,21 +26,6 @@ export abstract class Enemy {
     ) { }
 
     abstract draw(ctx: CanvasRenderingContext2D): void;
-    abstract update(deltaTime: number): void;
-}
-
-export class BasicEnemy extends Enemy {
-
-    constructor(x: number, y: number) {
-        super(x, y + 15 + 5, 100, 50, 'right', 15, []);
-    }
-
-    draw(ctx: CanvasRenderingContext2D): void {
-        ctx.fillStyle = 'red';
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fill();
-    }
 
     update(deltaTime: number): void {
 
@@ -64,7 +49,7 @@ export class BasicEnemy extends Enemy {
         }
     }
 
-    setCollisionMap(collisionMap: boolean[][]) : void {
+    setCollisionMap(collisionMap: boolean[][]): void {
         this.collisions = collisionMap;
     }
 
@@ -110,5 +95,41 @@ export class BasicEnemy extends Enemy {
                 }
             }
         }
+    }
+}
+
+export class BasicEnemy extends Enemy {
+
+    constructor(x: number, y: number) {
+        super(x, y + 15 + 5, 100, 50, 'right', 15, []);
+    }
+
+    draw(ctx: CanvasRenderingContext2D): void {
+        ctx.fillStyle = 'red';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    update(deltaTime: number): void {
+        super.update(deltaTime);
+    }
+
+}
+
+export class FastEnemy extends Enemy {
+    constructor(x: number, y: number) {
+        super(x, y + 15 + 5, 75, 200, 'right', 15, []);
+    }
+
+    draw(ctx: CanvasRenderingContext2D): void {
+        ctx.fillStyle = 'orange';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    update(deltaTime: number): void {
+        super.update(deltaTime);
     }
 }

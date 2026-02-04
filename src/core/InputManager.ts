@@ -1,8 +1,10 @@
+import { Rect } from "../utils/utils";
+
 export default class InputManager {
     private x: number = 0;
     private y: number = 0;
     private isMouseDown: boolean = false;
-    private isMouseClicked: boolean = false;
+    private isMouseConsumed: boolean = false;
     private keyPressed: string = '';
 
     constructor(canvas: HTMLCanvasElement) {
@@ -15,11 +17,11 @@ export default class InputManager {
 
         canvas.addEventListener('pointerdown', () => {
             this.isMouseDown = true;
-            this.isMouseClicked = true;
         });
 
         window.addEventListener('pointerup', () => {
             this.isMouseDown = false;
+            this.isMouseConsumed = false;
         });
 
         addEventListener('keydown', (e) => {
@@ -35,14 +37,20 @@ export default class InputManager {
         return { x: this.x, y: this.y };
     }
 
+    getRect(): Rect {
+        return new Rect(this.x, this.y, 1, 1);
+    }
+
     getMouseDown(): boolean {
         return this.isMouseDown;
     }
 
-    getMouseClicked(): boolean {
-        const wasClicked = this.isMouseClicked;
-        this.isMouseClicked = false;
-        return wasClicked;
+    getMouseConsumed(): boolean {
+        return this.isMouseConsumed;
+    }
+    
+    consumeMouseClick(): void {
+        this.isMouseConsumed = true;
     }
 
     getKeyPressed(): string {

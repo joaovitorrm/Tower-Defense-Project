@@ -1,20 +1,19 @@
 import InputManager from "./InputManager";
 import MapManager from "./MapManager";
-import { Turret } from "../entities/Turrets";
-import { distance, Position } from "../utils/utils";
-
 import { SETTINGS } from "../../data/configs/Settings";
 import UiManager from "./UiManager";
 import EnemyManager from "./EnemyManager";
+import Player from "../entities/Player";
+import TurretManager from "./TurretManager";
 
 export default class Game {
 
-    turrets: Turret[] = [];
-
     public inputManager: InputManager;
-    public mapManager: MapManager = new MapManager();;
-    public uiManager: UiManager = new UiManager();
-    public enemyManager: EnemyManager = new EnemyManager();
+    public mapManager: MapManager = new MapManager();
+    public uiManager: UiManager;
+    public enemyManager: EnemyManager;
+    public turretManager: TurretManager;
+    public player: Player = new Player(100, 10);
 
     constructor(canvas: HTMLCanvasElement) {
 
@@ -22,15 +21,11 @@ export default class Game {
 
         this.mapManager.setLevel(0);
 
-        this.enemyManager.setLevel(0);
+        this.enemyManager = new EnemyManager(this.mapManager);        
 
-        this.enemyManager.setCollisionMap(this.mapManager.getCollisionMap());
+        this.turretManager = new TurretManager(this.enemyManager);
 
-        const spawnPoint = this.mapManager.getSpawnPoint();
-        if (spawnPoint) {
-            this.enemyManager.setSpawnPoint(spawnPoint.x, spawnPoint.y);
-            this.enemyManager.spawnEnemies();
-        }
+        this.uiManager = new UiManager(this.inputManager, this.player, this.turretManager);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -39,7 +34,7 @@ export default class Game {
 
         this.mapManager.draw(ctx);
 
-        this.turrets.forEach(turret => turret.draw(ctx));
+        this.turretManager.draw(ctx);
 
         this.enemyManager.draw(ctx);
 
@@ -48,42 +43,10 @@ export default class Game {
 
     update(deltaTime: number): void {
 
+        this.uiManager.update();
+
         this.enemyManager.update(deltaTime);
 
-        this.turrets.forEach(turret => {
-
-            turret.update(deltaTime);
-
-            turret.shoots.forEach((shoot, index) => {
-                this.enemyManager.getEnemies().forEach(enemy => {
-                    if (distance(
-                        { x: shoot.vector.x, y: shoot.vector.y },
-                        { x: enemy.x, y: enemy.y }
-                    ) < shoot.radius + enemy.radius) {
-                        enemy.health -= shoot.damage;
-                        if (enemy.health <= 0) {
-                            enemy.isDead = true;
-                        }
-                        turret.shoots.splice(index, 1);
-                    }});
-                });
-
-                let foundTarget: Position | null = null;
-
-                for (const enemy of this.enemyManager.getEnemies()) {
-                    if (
-                        distance(
-                            { x: turret.x, y: turret.y },
-                            { x: enemy.x, y: enemy.y }
-                        ) <= turret.range
-                    ) {
-                        foundTarget = { x: enemy.x, y: enemy.y };
-                        break; // PARA no primeiro
-                    }
-                }
-
-                turret.target = foundTarget;
-            });
-
-        }
+        this.turretManager.update(deltaTime);
+    }
 }
