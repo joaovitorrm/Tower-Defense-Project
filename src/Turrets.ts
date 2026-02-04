@@ -109,9 +109,7 @@ export class SniperTurret extends Turret {
     shoots : Bullet[] = [];
 
     constructor(x: number, y: number) {
-
         const data = Turrets["SniperTurret"];
-
         super(data.range, data.damage, data.fireRate, data.shootSpeed, x, y);
     }
 
@@ -163,9 +161,7 @@ export class RapidFireTurret extends Turret {
     shoots : Bullet[] = [];
 
     constructor(x: number, y: number) {
-
         const data = Turrets["RapidFireTurret"];
-
         super(data.range, data.damage, data.fireRate, data.shootSpeed, x, y);
     }
 
