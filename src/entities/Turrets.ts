@@ -1,6 +1,6 @@
-import { angleBetween, Position, VectorA } from "./utils";
+import { angleBetween, Position, VectorA } from "../utils/utils";
 
-import Turrets from "./turrets.json" assert { type: "json" };
+import Turrets from "../../data/configs/turrets.json" assert { type: "json" };
 
 export abstract class Turret {
     public cooldown: number = 0;

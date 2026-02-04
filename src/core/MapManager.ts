@@ -1,9 +1,9 @@
-import { levels } from "./maps/levels";
-import { SETTINGS } from "./Settings";
+import { levels } from "../../data/levels/levels";
+import { SETTINGS } from "../../data/configs/Settings";
 
 const tiles = {
-    "#": "grey",
-    ".": "green",
+    "#": "hsl(0, 0%, 20%)",
+    ".": "hsl(120, 70%, 30%)",
     "s": "yellow",
     "e": "red",
     " ": "white",
@@ -21,6 +21,7 @@ export default class MapManager {
     setLevel(level: number): void {
         this.level = level;
         this.map = levels[level];
+
         this.parseMap();
     }
 
@@ -29,9 +30,9 @@ export default class MapManager {
         this.collisionMap = [];
         this.spawnPoint = null;
 
-        for (let y = 0; y < level.length; y++) {
+        for (let y = 0; y < SETTINGS.MAP_ROWS; y++) {
             this.collisionMap[y] = [];
-            for (let x = 0; x < level[y].length; x++) {
+            for (let x = 0; x < SETTINGS.MAP_COLS; x++) {
                 const tile = level[y][x];
                 this.collisionMap[y][x] = tile === "#" || tile === "e" || tile === "s";
                 if (tile === "s") {
@@ -57,18 +58,19 @@ export default class MapManager {
         return this.spawnPoint;
     }
 
+    spawnEnemy(): void {
+        
+    }
+
     draw(ctx: CanvasRenderingContext2D): void {
         const level = this.map.level;
         
-        for (let y = 0; y < level.length; y++) {
-            for (let x = 0; x < level[y].length; x++) {
+        for (let y = 0; y < SETTINGS.MAP_ROWS; y++) {
+            for (let x = 0; x < SETTINGS.MAP_COLS; x++) {
                 const tile = level[y][x];
                 ctx.fillStyle = tiles[tile as keyof typeof tiles] || "purple";
                 ctx.fillRect(x * this.tileSize, y * this.tileSize, this.tileSize, this.tileSize);
             }
         }
     }
-
-
-
 }

@@ -1,0 +1,10 @@
+export const SETTINGS = {
+    CANVAS_WIDTH: 1100,
+    CANVAS_HEIGHT: 600,    
+    TILE_SIZE: 40,
+    MAP_ROWS: 15,
+    MAP_COLS: 20,
+    RIGHT_PANEL_WIDTH: 1100 - (40*20),
+    INITIAL_MONEY: 100,
+    INITIAL_LIVES: 10,
+};

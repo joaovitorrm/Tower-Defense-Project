@@ -1,4 +1,4 @@
-import { Rect } from "./utils";
+import { Rect } from "../utils/utils";
 
 export default class UiManager {
     uiElements: UiElement[] = [];

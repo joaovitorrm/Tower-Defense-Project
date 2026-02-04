@@ -1,4 +1,4 @@
-import { SETTINGS } from "./Settings";
+import { SETTINGS } from "../../data/configs/Settings";
 
 type direction = 'left' | 'right' | 'up' | 'down';
 
@@ -13,6 +13,7 @@ const oppositeDirections: { [key in direction]: direction } = {
 export abstract class Enemy {
 
     protected hasColided: boolean = false;
+    public isDead: boolean = false;
 
     constructor(
         public x: number,
@@ -30,8 +31,8 @@ export abstract class Enemy {
 
 export class BasicEnemy extends Enemy {
 
-    constructor(x: number, y: number, health: number, speed: number, radius: number, direction: direction, collisionMap: boolean[][]) {
-        super(x, y + radius + 5, health, speed, direction, radius, collisionMap);
+    constructor(x: number, y: number) {
+        super(x, y + 15 + 5, 100, 50, 'right', 15, []);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -61,6 +62,10 @@ export class BasicEnemy extends Enemy {
                 this.y += this.speed * deltaTime;
                 break;
         }
+    }
+
+    setCollisionMap(collisionMap: boolean[][]) : void {
+        this.collisions = collisionMap;
     }
 
     checkCollision(dir?: direction): boolean {
