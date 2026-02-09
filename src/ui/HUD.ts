@@ -1,7 +1,7 @@
 import { SETTINGS } from "../../data/configs/Settings";
 import type InputManager from "../core/InputManager";
 import type TurretManager from "../core/TurretManager";
-import { Label, LabelButton, ToggleButton, UiElement } from "../core/UiElement";
+import { Label, LabelButton, Panel, ToggleButton, UiElement } from "./UiElement";
 import type Player from "../entities/Player";
 import { BasicTurret, RapidFireTurret, SniperTurret } from "../entities/Turrets";
 
@@ -9,21 +9,10 @@ import { Rect } from "../utils/utils";
 
 export class HUD extends UiElement {
 
-    private width: number = SETTINGS.RIGHT_PANEL_WIDTH;
-    private height: number = SETTINGS.CANVAS_HEIGHT;
-
-    private x: number = SETTINGS.CANVAS_WIDTH - this.width;
-    private y: number = 0;
-
-    draw(ctx: CanvasRenderingContext2D) {
-
+    drawSelf(ctx: CanvasRenderingContext2D) {
         if (this.player.placingTurret) {
             this.player.placingTurret.draw(ctx);
         }
-
-        ctx.fillStyle = "black";
-        ctx.fillRect(this.x, this.y, this.width, this.height);
-        this.children.forEach(element => element.draw(ctx));
     }
 
     update(input: InputManager): void {
@@ -44,54 +33,89 @@ export class HUD extends UiElement {
     }
 
     constructor(private player: Player, private turretManager: TurretManager) {
-        super(new Rect(SETTINGS.CANVAS_WIDTH - SETTINGS.RIGHT_PANEL_WIDTH, 0, SETTINGS.RIGHT_PANEL_WIDTH, SETTINGS.CANVAS_HEIGHT));
+        super(new Rect(0, 0, SETTINGS.CANVAS_WIDTH, SETTINGS.CANVAS_HEIGHT));
+
+        const rightPanel = new Panel(
+            new Rect(SETTINGS.CANVAS_WIDTH - SETTINGS.RIGHT_PANEL_WIDTH, 0, SETTINGS.RIGHT_PANEL_WIDTH, SETTINGS.CANVAS_HEIGHT),
+            this.rect,
+            "black"
+        );
+        this.addChild(rightPanel);
 
         const basicTurretButton = new LabelButton(
-            new Rect(10, 10, this.width - 20, 40),
-            this.rect,
+            new Rect(10, 400, rightPanel.getWidth() - 20, 40),
+            rightPanel.getRect(),
             () => {
                 this.player.placingTurret = new BasicTurret(0, 0);
             },
-            "Basic Turret"
+            "Basic Turret",
+            16,
+            "white",
+            "hsl(0, 0%, 12%)"
         );
-        this.addChild(basicTurretButton);
+        rightPanel.addChild(basicTurretButton);
 
         const rapidFireTurretButton = new LabelButton(
-            new Rect(10, 60, this.width - 20, 40),
-            this.rect,
+            new Rect(10, 450, rightPanel.getWidth() - 20, 40),
+            rightPanel.getRect(),
             () => {
                 this.player.placingTurret = new RapidFireTurret(0, 0);
-            },
-            "Rapid Fire Turret"
+            },            
+            "Rapid Fire Turret",
+            16,
+            "white",
+            "hsl(0, 0%, 12%)"
         );
-        this.addChild(rapidFireTurretButton);
+        rightPanel.addChild(rapidFireTurretButton);
 
         const sniperTurretButton = new LabelButton(
-            new Rect(10, 110, this.width - 20, 40),
-            this.rect,
+            new Rect(10, 500, rightPanel.getWidth() - 20, 40),
+            rightPanel.getRect(),
             () => {
                 this.player.placingTurret = new SniperTurret(0, 0);
             },
-            "Sniper Turret"
+            "Sniper Turret",
+            16,
+            "white",
+            "hsl(0, 0%, 12%)"
         );
-        this.addChild(sniperTurretButton);
+        rightPanel.addChild(sniperTurretButton);
 
         const hideRangeButton = new ToggleButton(
-            new Rect(10, 160, 40, 40),
-            this.rect,
+            new Rect(10, 550, 40, 40),
+            rightPanel.getRect(),
             () => {
                 this.turretManager.toggleRangeVisibility();
             },
             this.turretManager.isRangeVisible() ? true : false,
         );
-        this.addChild(hideRangeButton);
+        rightPanel.addChild(hideRangeButton);
 
         const hideRangeLabel = new Label(
-            new Rect(60, 170, this.width - 70, 40),
-            this.rect,
+            new Rect(60, 560, rightPanel.getWidth() - 70, 40),
+            rightPanel.getRect(),
             "Show Range",
+            16,
             "white"
         );
-        this.addChild(hideRangeLabel);
+        rightPanel.addChild(hideRangeLabel);
+
+        const moneyLabel = new Label(
+            new Rect(10, 10, rightPanel.getWidth() - 20, 40),
+            rightPanel.getRect(),
+            `Money: $${this.player.getMoney()}`,
+            16,
+            "white"
+        );
+        rightPanel.addChild(moneyLabel);
+
+        const healthLabel = new Label(
+            new Rect(10, 40, rightPanel.getWidth() - 20, 40),
+            rightPanel.getRect(),
+            `Health: ${this.player.getLives()}`,
+            16,
+            "white"
+        );
+        rightPanel.addChild(healthLabel);
     }
 }

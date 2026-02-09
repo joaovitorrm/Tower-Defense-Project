@@ -2,7 +2,7 @@ import type Player from "../entities/Player";
 import { HUD } from "../ui/HUD";
 import type InputManager from "./InputManager";
 import type TurretManager from "./TurretManager";
-import { UiElement } from "./UiElement";
+import { UiElement } from "../ui/UiElement";
 
 export default class UiManager {
     uiElements: UiElement[] = [];
