@@ -83,6 +83,10 @@ export abstract class Turret {
         return this.shootSpeed;
     }
 
+    getShoots(): Bullet[] {
+        return this.shoots;
+    }
+
     getBulletRadius(): number {
         return this.bulletRadius;
     }
@@ -94,6 +98,10 @@ export abstract class Turret {
     setPosition(x: number, y: number): void {
         this.x = x;
         this.y = y;
+    }
+
+    removeBulletByIndex(index: number) : void {
+        this.shoots.splice(index, 1);
     }
 }
 

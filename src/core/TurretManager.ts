@@ -27,21 +27,21 @@ export default class TurretManager {
             for (const enemy of enemies) {
                 if (
                     distance(
-                        { x: turret.x, y: turret.y },
+                        turret.getPosition(),
                         { x: enemy.x, y: enemy.y }
-                    ) <= turret.range
+                    ) <= turret.getRange()
                 ) {
                     target = { x: enemy.x, y: enemy.y };
                     break;
                 }
             }
-            turret.target = target;
+            turret.setTarget(target);
 
             // 🔫 Atualizar turret
             turret.update(deltaTime, input);
 
             // 💥 Colisão bala x inimigo
-            turret.shoots.forEach((shoot, shootIndex) => {
+            turret.getShoots().forEach((shoot, shootIndex) => {
                 enemies.forEach(enemy => {
                     if (
                         distance(
@@ -53,7 +53,7 @@ export default class TurretManager {
                         if (enemy.health <= 0) {
                             enemy.isDead = true;
                         }
-                        turret.shoots.splice(shootIndex, 1);
+                        turret.removeBulletByIndex(shootIndex);
                     }
                 });
             });
@@ -70,7 +70,7 @@ export default class TurretManager {
 
     toggleRangeVisibility(): void {
         this.showRange = !this.showRange;
-        this.turrets.forEach(turret => turret.showRange = this.showRange);
+        this.turrets.forEach(turret => turret.setShowRange(this.showRange));
     }
 
     clear(): void {
