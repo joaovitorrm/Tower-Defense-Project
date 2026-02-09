@@ -18,7 +18,7 @@ export default class MapManager {
 
     constructor() {}
 
-    setLevel(level: number): void {
+    setMap(level: number): void {
         this.level = level;
         this.map = levels[level];
 

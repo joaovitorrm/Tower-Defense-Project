@@ -19,13 +19,13 @@ export default class Game {
 
         this.inputManager = new InputManager(canvas);
 
-        this.mapManager.setLevel(0);
+        this.mapManager.setMap(0);
 
         this.enemyManager = new EnemyManager(this.mapManager);        
 
-        this.turretManager = new TurretManager(this.enemyManager);
+        this.turretManager = new TurretManager();
 
-        this.uiManager = new UiManager(this.inputManager, this.player, this.turretManager);
+        this.uiManager = new UiManager(this.inputManager, this.player, this.turretManager, this.mapManager);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -47,6 +47,6 @@ export default class Game {
 
         this.enemyManager.update(deltaTime);
 
-        this.turretManager.update(deltaTime);
+        this.turretManager.update(deltaTime, this.inputManager, this.enemyManager);
     }
 }

@@ -1,27 +1,62 @@
-import { angleBetween, Position, VectorA } from "../utils/utils";
+import { angleBetween, distance, Position, VectorA } from "../utils/utils";
 
 import Turrets from "../../data/configs/turrets.json" assert { type: "json" };
+import type InputManager from "../core/InputManager";
+import { SETTINGS } from "../../data/configs/Settings";
 
 export abstract class Turret {
     public cooldown: number = 0;
     public showRange: boolean = true;
     public target: Position | null = null;
     public shoots: Bullet[] = [];
+    public isHovering: boolean = false;
 
     constructor(
+        public turretRadius: number,
         public range: number,
         public damage: number,
         public fireRate: number,
-        public speed: number,
+        public shootSpeed: number,
+        public bulletRadius: number,
         public x: number,
         public y: number
     ) { }
 
-    abstract shoot(target: Position): void;
+    draw(ctx: CanvasRenderingContext2D): void {
+        this.shoots.forEach(shoot => shoot.draw(ctx));
+    };
 
-    abstract draw(ctx: CanvasRenderingContext2D): void;
+    update(deltaTime: number, input: InputManager): void {
 
-    abstract update(deltaTime: number): void;
+        this.isHovering = (distance({ x: this.x, y: this.y }, input.getMousePosition()) <= this.turretRadius) ? true : false;                 
+
+        if (this.cooldown >= 1 / this.fireRate) {
+            if (this.target) {
+                this.shoot(this.target);
+                this.cooldown = 0;
+            }
+        } else {
+            this.cooldown += deltaTime;
+        }
+
+        this.shoots.forEach((shoot, index) => {
+            shoot.update(deltaTime);
+
+            // Remove shoot if it goes out of bounds (for simplicity, assuming canvas size 800x600)
+            if (shoot.vector.x < 0 || shoot.vector.x > SETTINGS.CANVAS_WIDTH || shoot.vector.y < 0 || shoot.vector.y > SETTINGS.CANVAS_HEIGHT) {
+                this.shoots.splice(index, 1);
+            }
+        });
+    };
+
+    shoot(target: Position): void {
+        const angle = angleBetween({ x: this.x, y: this.y }, target);
+        this.shoots.push(new Bullet(new VectorA(this.x, this.y, angle), this.shootSpeed, this.bulletRadius, this.damage));
+    }
+
+    setTarget(target: Position | null): void {
+        this.target = target;
+    }
 }
 
 class Bullet {
@@ -53,12 +88,7 @@ export class BasicTurret extends Turret {
 
         const data = Turrets["BasicTurret"];
 
-        super(data.range, data.damage, data.fireRate, data.shootSpeed, x, y);
-    }
-
-    shoot(target: Position): void {
-        const angle = angleBetween({ x: this.x, y: this.y }, target);
-        this.shoots.push(new Bullet(new VectorA(this.x, this.y, angle), Turrets["BasicTurret"].shootSpeed, Turrets["BasicTurret"].bulletRadius, this.damage));
+        super(30, data.range, data.damage, data.fireRate, data.shootSpeed, data.bulletRadius, x, y);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -67,7 +97,7 @@ export class BasicTurret extends Turret {
         ctx.arc(this.x, this.y, 30, 0, Math.PI * 2);
         ctx.fill();
 
-        if (this.showRange) {
+        if (this.showRange || this.isHovering) {
             ctx.strokeStyle = 'rgba(0, 0, 255, 0.3)';
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2);
@@ -78,30 +108,6 @@ export class BasicTurret extends Turret {
 
         this.shoots.forEach(shoot => shoot.draw(ctx));
     }
-
-    update(deltaTime: number): void {
-        if (this.cooldown >= 1 / this.fireRate) {
-            if (this.target) {
-                this.shoot(this.target);
-                this.cooldown = 0;
-            }
-        } else {
-            this.cooldown += deltaTime;
-        }
-
-        this.shoots.forEach((shoot, index) => {
-            shoot.update(deltaTime);
-
-            // Remove shoot if it goes out of bounds (for simplicity, assuming canvas size 800x600)
-            if (shoot.vector.x < 0 || shoot.vector.x > 800 || shoot.vector.y < 0 || shoot.vector.y > 600) {
-                this.shoots.splice(index, 1);
-            }
-        });
-    }
-
-    setTarget(target: Position | null): void {
-        this.target = target;
-    }
 }
 
 export class SniperTurret extends Turret {
@@ -110,7 +116,7 @@ export class SniperTurret extends Turret {
 
     constructor(x: number, y: number) {
         const data = Turrets["SniperTurret"];
-        super(data.range, data.damage, data.fireRate, data.shootSpeed, x, y);
+        super(30, data.range, data.damage, data.fireRate, data.shootSpeed, data.bulletRadius, x, y);
     }
 
     shoot(target: Position): void {
@@ -123,7 +129,7 @@ export class SniperTurret extends Turret {
         ctx.beginPath();
         ctx.arc(this.x, this.y, 30, 0, Math.PI * 2);
         ctx.fill();
-        if (this.showRange) {
+        if (this.showRange || this.isHovering) {
             ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2);
@@ -132,27 +138,7 @@ export class SniperTurret extends Turret {
             ctx.fill();
         }
 
-        this.shoots.forEach(shoot => shoot.draw(ctx));
-    }
-
-    update(deltaTime: number): void {
-        if (this.cooldown >= 1 / this.fireRate) {
-            if (this.target) {
-                this.shoot(this.target);
-                this.cooldown = 0;
-            }
-        } else {
-            this.cooldown += deltaTime;
-        }
-
-        this.shoots.forEach((shoot, index) => {
-            shoot.update(deltaTime);
-
-            // Remove shoot if it goes out of bounds (for simplicity, assuming canvas size 800x600)
-            if (shoot.vector.x < 0 || shoot.vector.x > 800 || shoot.vector.y < 0 || shoot.vector.y > 600) {
-                this.shoots.splice(index, 1);
-            }
-        });
+        super.draw(ctx);
     }
 }
 
@@ -162,12 +148,7 @@ export class RapidFireTurret extends Turret {
 
     constructor(x: number, y: number) {
         const data = Turrets["RapidFireTurret"];
-        super(data.range, data.damage, data.fireRate, data.shootSpeed, x, y);
-    }
-
-    shoot(target: Position): void {
-        const angle = angleBetween({ x: this.x, y: this.y }, target);
-        this.shoots.push(new Bullet(new VectorA(this.x, this.y, angle), Turrets["RapidFireTurret"].shootSpeed, Turrets["RapidFireTurret"].bulletRadius, this.damage));
+        super(30, data.range, data.damage, data.fireRate, data.shootSpeed, data.bulletRadius, x, y);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -175,7 +156,7 @@ export class RapidFireTurret extends Turret {
         ctx.beginPath();
         ctx.arc(this.x, this.y, 30, 0, Math.PI * 2);
         ctx.fill();
-        if (this.showRange) {
+        if (this.showRange || this.isHovering) {
             ctx.strokeStyle = 'rgba(255, 165, 0, 0.3)';
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.range, 0, Math.PI * 2);
@@ -184,27 +165,7 @@ export class RapidFireTurret extends Turret {
             ctx.fill();
         }
 
-        this.shoots.forEach(shoot => shoot.draw(ctx));
-    }
-
-    update(deltaTime: number): void {
-        if (this.cooldown >= 1 / this.fireRate) {
-            if (this.target) {
-                this.shoot(this.target);
-                this.cooldown = 0;
-            }
-        } else {
-            this.cooldown += deltaTime;
-        }
-
-        this.shoots.forEach((shoot, index) => {
-            shoot.update(deltaTime);
-
-            // Remove shoot if it goes out of bounds (for simplicity, assuming canvas size 800x600)
-            if (shoot.vector.x < 0 || shoot.vector.x > 800 || shoot.vector.y < 0 || shoot.vector.y > 600) {
-                this.shoots.splice(index, 1);
-            }
-        });
+        super.draw(ctx);
     }
 }
 

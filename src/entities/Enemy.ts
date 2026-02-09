@@ -14,6 +14,7 @@ export abstract class Enemy {
 
     protected hasColided: boolean = false;
     public isDead: boolean = false;
+    public bounty: number = 0;
 
     constructor(
         public x: number,
@@ -21,7 +22,7 @@ export abstract class Enemy {
         public health: number,
         public speed: number,
         public direction: direction,
-        public radius: number = 15,
+        public radius: number = 15,        
         protected collisions: boolean[][] = []
     ) { }
 
@@ -124,6 +125,23 @@ export class FastEnemy extends Enemy {
 
     draw(ctx: CanvasRenderingContext2D): void {
         ctx.fillStyle = 'orange';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    update(deltaTime: number): void {
+        super.update(deltaTime);
+    }
+}
+
+export class TankEnemy extends Enemy {
+    constructor(x: number, y: number) {
+        super(x, y + 15 + 5, 300, 40, 'right', 15, []);
+    }
+
+    draw(ctx: CanvasRenderingContext2D): void {
+        ctx.fillStyle = 'grey';
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
         ctx.fill();

@@ -1,12 +1,13 @@
 import { Turret } from "../entities/Turrets";
 import EnemyManager from "./EnemyManager";
 import { distance, Position } from "../utils/utils";
+import type InputManager from "./InputManager";
 
 export default class TurretManager {
     private turrets: Turret[] = [];
-    private showRange: boolean = true;
+    private showRange: boolean = false;
 
-    constructor(private enemyManager: EnemyManager) {}
+    constructor() {}
 
     addTurret(turret: Turret): void {
         this.turrets.push(turret);
@@ -16,8 +17,8 @@ export default class TurretManager {
         this.turrets = this.turrets.filter(t => t !== turret);
     }
 
-    update(deltaTime: number): void {
-        const enemies = this.enemyManager.getEnemies();
+    update(deltaTime: number, input: InputManager, enemyManager: EnemyManager): void {
+        const enemies = enemyManager.getEnemies();
 
         this.turrets.forEach(turret => {
 
@@ -37,7 +38,7 @@ export default class TurretManager {
             turret.target = target;
 
             // 🔫 Atualizar turret
-            turret.update(deltaTime);
+            turret.update(deltaTime, input);
 
             // 💥 Colisão bala x inimigo
             turret.shoots.forEach((shoot, shootIndex) => {

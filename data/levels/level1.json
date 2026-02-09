@@ -17,22 +17,75 @@
         "..................e."
     ],
     "enemyWaves": [
-        {
-            "enemies": [
-                { "type": "basic", "spawnAmount": 2, "spawnInterval": 1},
-                { "type": "fast", "spawnAmount": 10, "spawnInterval": 0.5 }
+        [
+            [
+                {
+                    "type": "basic",
+                    "amount": 5,
+                    "interval": 1,
+                    "bounty": 10
+                },
+                {
+                    "type": "fast",
+                    "amount": 3,
+                    "interval": 1.2,
+                    "bounty": 15
+                },
+                {
+                    "type": "tank",
+                    "amount": 2,
+                    "interval": 1.5,
+                    "bounty": 30
+                }
+            ],
+            [
+                {
+                    "type": "basic",
+                    "amount": 10,
+                    "interval": 0.8,
+                    "bounty": 10
+                }
+            ],
+            [
+                {
+                    "type": "fast",
+                    "amount": 5,
+                    "interval": 1,
+                    "bounty": 15
+                }
             ]
-        },
-        {
-            "enemies": [
-                { "type": "basic", "spawnAmount": 15, "spawnInterval": 0.8 }                
+        ],
+        [
+            [
+                {
+                    "type": "basic",
+                    "amount": 15,
+                    "interval": 0.7,
+                    "bounty": 10
+                }
+            ],
+            [
+                {
+                    "type": "fast",
+                    "amount": 10,
+                    "interval": 0.9,
+                    "bounty": 15
+                }
+            ],
+            [
+                {
+                    "type": "basic",
+                    "amount": 20,
+                    "interval": 0.5,
+                    "bounty": 10
+                },
+                {
+                    "type": "tank",
+                    "amount": 15,
+                    "interval": 0.8,
+                    "bounty": 30
+                }
             ]
-        },
-        {
-            "enemies": [
-                { "type": "basic", "spawnAmount": 20, "spawnInterval": 0.5 },
-                { "type": "fast", "spawnAmount": 10, "spawnInterval": 1 }
-            ]
-        }
+        ]
     ]
 }

@@ -6,6 +6,8 @@ import type Player from "../entities/Player";
 import { BasicTurret, RapidFireTurret, SniperTurret } from "../entities/Turrets";
 
 import { Rect } from "../utils/utils";
+import { EventBusInstance } from "../core/EventBus";
+import type MapManager from "../core/MapManager";
 
 export class HUD extends UiElement {
 
@@ -32,7 +34,7 @@ export class HUD extends UiElement {
         }
     }
 
-    constructor(private player: Player, private turretManager: TurretManager) {
+    constructor(private player: Player, private turretManager: TurretManager, private mapManager: MapManager) {
         super(new Rect(0, 0, SETTINGS.CANVAS_WIDTH, SETTINGS.CANVAS_HEIGHT));
 
         const rightPanel = new Panel(
@@ -107,6 +109,9 @@ export class HUD extends UiElement {
             16,
             "white"
         );
+        EventBusInstance.on('moneyChanged', () => {
+            moneyLabel.setText(`Money: $${this.player.getMoney()}`);
+        });
         rightPanel.addChild(moneyLabel);
 
         const healthLabel = new Label(
@@ -116,6 +121,22 @@ export class HUD extends UiElement {
             16,
             "white"
         );
+        EventBusInstance.on('lifeChanged', () => {
+            healthLabel.setText(`Health: ${this.player.getLives()}`);
+        });
         rightPanel.addChild(healthLabel);
+
+        const waveLabel = new Label(
+            new Rect(400, 10, 0, 0),
+            this.getRect(),
+            `Wave: ${this.mapManager.getLevel()+1}`,
+            16,
+            "white"
+        );
+        EventBusInstance.on('waveChanged', ({ wave }) => {
+            waveLabel.setText(`Wave: ${wave}`);
+            console.log("A");
+        });
+        this.addChild(waveLabel);
     }
 }

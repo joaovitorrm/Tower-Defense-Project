@@ -3,11 +3,12 @@ import { HUD } from "../ui/HUD";
 import type InputManager from "./InputManager";
 import type TurretManager from "./TurretManager";
 import { UiElement } from "../ui/UiElement";
+import type MapManager from "./MapManager";
 
 export default class UiManager {
     uiElements: UiElement[] = [];
 
-    constructor(private inputManager: InputManager, private player: Player, private turretManager: TurretManager) {
+    constructor(private inputManager: InputManager, private player: Player, private turretManager: TurretManager, private mapManager: MapManager) {
         this.loadHUD();
     }
 
@@ -32,7 +33,7 @@ export default class UiManager {
     }
 
     loadHUD(): void {
-        const hud = new HUD(this.player, this.turretManager);
+        const hud = new HUD(this.player, this.turretManager, this.mapManager);
         this.addElement(hud);
     }
 }
