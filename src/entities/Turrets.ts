@@ -5,21 +5,22 @@ import type InputManager from "../core/InputManager";
 import { SETTINGS } from "../../data/configs/Settings";
 
 export abstract class Turret {
-    public cooldown: number = 0;
-    public showRange: boolean = true;
-    public target: Position | null = null;
-    public shoots: Bullet[] = [];
-    public isHovering: boolean = false;
+    protected cooldown: number = 0;
+    protected showRange: boolean = true;
+    protected target: Position | null = null;
+    protected shoots: Bullet[] = [];
+    protected isHovering: boolean = false;
+    protected name: string = "";
 
     constructor(
-        public turretRadius: number,
-        public range: number,
-        public damage: number,
-        public fireRate: number,
-        public shootSpeed: number,
-        public bulletRadius: number,
-        public x: number,
-        public y: number
+        protected turretRadius: number,
+        protected range: number,
+        protected damage: number,
+        protected fireRate: number,
+        protected shootSpeed: number,
+        protected bulletRadius: number,
+        protected x: number,
+        protected y: number
     ) { }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -57,6 +58,43 @@ export abstract class Turret {
     setTarget(target: Position | null): void {
         this.target = target;
     }
+
+    getName(): string {
+        return this.name;
+    }
+
+    getRange(): number {
+        return this.range;
+    }
+
+    getPosition(): Position {
+        return { x: this.x, y: this.y };
+    }
+
+    getDamage(): number {
+        return this.damage;
+    }
+
+    getFireRate(): number {
+        return this.fireRate;
+    }
+
+    getShootSpeed(): number {
+        return this.shootSpeed;
+    }
+
+    getBulletRadius(): number {
+        return this.bulletRadius;
+    }
+
+    setShowRange(show: boolean): void {
+        this.showRange = show;
+    }
+
+    setPosition(x: number, y: number): void {
+        this.x = x;
+        this.y = y;
+    }
 }
 
 class Bullet {
@@ -83,6 +121,8 @@ class Bullet {
 export class BasicTurret extends Turret {
 
     shoots: Bullet[] = [];
+
+    name = "Basic Turret";
 
     constructor(x: number, y: number) {
 
@@ -113,6 +153,8 @@ export class BasicTurret extends Turret {
 export class SniperTurret extends Turret {
 
     shoots: Bullet[] = [];
+
+    name = "Sniper Turret";
 
     constructor(x: number, y: number) {
         const data = Turrets["SniperTurret"];
@@ -145,6 +187,8 @@ export class SniperTurret extends Turret {
 export class RapidFireTurret extends Turret {
 
     shoots: Bullet[] = [];
+
+    name = "Rapid Fire Turret";
 
     constructor(x: number, y: number) {
         const data = Turrets["RapidFireTurret"];

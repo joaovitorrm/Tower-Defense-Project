@@ -3,6 +3,7 @@ import { BasicEnemy, FastEnemy, TankEnemy, type Enemy } from "../entities/Enemy"
 import { levels } from "../../data/levels/levels";
 import type MapManager from "./MapManager";
 import { EventBusInstance } from "./EventBus";
+import { SETTINGS } from "../../data/configs/Settings";
 
 const enemyTypes = {
     "basic": BasicEnemy,
@@ -82,11 +83,16 @@ export default class EnemyManager {
         }
 
         this.enemies.forEach(e => e.update(deltaTime));
+
         this.enemies = this.enemies.filter((e) => {
             if (e.isDead) {
-                EventBusInstance.emit('enemyKilled', { enemy: e });
+                EventBusInstance.emit('enemyKilled', { bounty: e.bounty });
+                return false;
+            } else if (e.x + e.radius*2 < 0 || e.x - e.radius*2 > SETTINGS.CANVAS_WIDTH || e.y + e.radius*2 < 0 || e.y - e.radius*2 > SETTINGS.CANVAS_HEIGHT) {
+                EventBusInstance.emit('enemyEscaped');
+                return false;
             }
-            return !e.isDead;
+            return true;
         });
     }
 

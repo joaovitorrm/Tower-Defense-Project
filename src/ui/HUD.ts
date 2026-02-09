@@ -6,8 +6,8 @@ import type Player from "../entities/Player";
 import { BasicTurret, RapidFireTurret, SniperTurret } from "../entities/Turrets";
 
 import { Rect } from "../utils/utils";
-import { EventBusInstance } from "../core/EventBus";
 import type MapManager from "../core/MapManager";
+import TurretPreview from "./TurretPreview";
 
 export class HUD extends UiElement {
 
@@ -22,12 +22,11 @@ export class HUD extends UiElement {
 
         if (this.player.placingTurret !== null) {
             const mousePos = input.getMousePosition();
-            this.player.placingTurret.x = mousePos.x;
-            this.player.placingTurret.y = mousePos.y;
+            this.player.placingTurret.setPosition(mousePos.x, mousePos.y);
 
             if (input.getMouseDown() && !input.getMouseConsumed()) {
                 input.consumeMouseClick();
-                this.player.placingTurret.showRange = this.turretManager.isRangeVisible();
+                this.player.placingTurret.setShowRange(this.turretManager.isRangeVisible());
                 this.turretManager.addTurret(this.player.placingTurret);
                 this.player.placingTurret = null;
             }
@@ -50,7 +49,7 @@ export class HUD extends UiElement {
             () => {
                 this.player.placingTurret = new BasicTurret(0, 0);
             },
-            "Basic Turret",
+            () => "Basic Turret",
             16,
             "white",
             "hsl(0, 0%, 12%)"
@@ -63,7 +62,7 @@ export class HUD extends UiElement {
             () => {
                 this.player.placingTurret = new RapidFireTurret(0, 0);
             },            
-            "Rapid Fire Turret",
+            () => "Rapid Fire Turret",
             16,
             "white",
             "hsl(0, 0%, 12%)"
@@ -76,7 +75,7 @@ export class HUD extends UiElement {
             () => {
                 this.player.placingTurret = new SniperTurret(0, 0);
             },
-            "Sniper Turret",
+            () => "Sniper Turret",
             16,
             "white",
             "hsl(0, 0%, 12%)"
@@ -96,47 +95,60 @@ export class HUD extends UiElement {
         const hideRangeLabel = new Label(
             new Rect(60, 560, rightPanel.getWidth() - 70, 40),
             rightPanel.getRect(),
-            "Show Range",
+            () => this.turretManager.isRangeVisible() ? "Hide Range" : "Show Range",
             16,
             "white"
         );
         rightPanel.addChild(hideRangeLabel);
 
+        // TURRET PREVIEW
+        const turretPreview = new TurretPreview(
+            new Rect(10, 100, rightPanel.getWidth() - 20, 280),
+            rightPanel.getRect()
+        );
+        rightPanel.addChild(turretPreview);
+
+        basicTurretButton.setHoverEnter(() => {
+            turretPreview.setTurret(new BasicTurret(0, 0));
+        });
+
+        rapidFireTurretButton.setHoverEnter(() => {
+            turretPreview.setTurret(new RapidFireTurret(0, 0));
+        });
+
+        sniperTurretButton.setHoverEnter(() => {
+            turretPreview.setTurret(new SniperTurret(0, 0));
+        });
+
+        // MONEY LABEL
         const moneyLabel = new Label(
             new Rect(10, 10, rightPanel.getWidth() - 20, 40),
             rightPanel.getRect(),
-            `Money: $${this.player.getMoney()}`,
+            () => `Money: $${this.player.getMoney()}`,
             16,
             "white"
         );
-        EventBusInstance.on('moneyChanged', () => {
-            moneyLabel.setText(`Money: $${this.player.getMoney()}`);
-        });
         rightPanel.addChild(moneyLabel);
 
+        // HEALTH LABEL
         const healthLabel = new Label(
             new Rect(10, 40, rightPanel.getWidth() - 20, 40),
             rightPanel.getRect(),
-            `Health: ${this.player.getLives()}`,
+            () => `Health: ${this.player.getLives()}`,
             16,
             "white"
         );
-        EventBusInstance.on('lifeChanged', () => {
-            healthLabel.setText(`Health: ${this.player.getLives()}`);
-        });
         rightPanel.addChild(healthLabel);
 
+
+        // WAVE LABEL
         const waveLabel = new Label(
             new Rect(400, 10, 0, 0),
             this.getRect(),
-            `Wave: ${this.mapManager.getLevel()+1}`,
+            () => `Wave: ${this.mapManager.getLevel()+1}`,
             16,
             "white"
         );
-        EventBusInstance.on('waveChanged', ({ wave }) => {
-            waveLabel.setText(`Wave: ${wave}`);
-            console.log("A");
-        });
         this.addChild(waveLabel);
     }
 }

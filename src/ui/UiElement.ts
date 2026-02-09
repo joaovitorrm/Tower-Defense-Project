@@ -4,6 +4,7 @@ import type InputManager from "../core/InputManager";
 export abstract class UiElement {
 
     protected children: UiElement[] = [];
+    protected isHovering: boolean = false;
 
     constructor(protected rect: Rect, protected parent: Rect | null = null) { }
 
@@ -29,6 +30,18 @@ export abstract class UiElement {
         return this.rect.height;
     }
 
+    getHovering(): boolean {
+        return this.isHovering;
+    }
+
+    setHoverEnter(callback: () => void): void {
+        this.onHoverEnter = callback;
+    }
+
+    setHoverExit(callback: () => void): void {
+        this.onHoverExit = callback;
+    }
+
     draw(ctx: CanvasRenderingContext2D): void {
         this.drawSelf(ctx);
         this.drawChildren(ctx);
@@ -41,6 +54,14 @@ export abstract class UiElement {
     }
 
     update(input: InputManager): void {
+        this.isHovering = this.getRect().collidesWith(input.getRect()) ? true : false;
+
+        if (this.isHovering) {
+            this.onHoverEnter();
+        } else {
+            this.onHoverExit();
+        }
+        
         this.children.forEach(child => child.update(input));
     }
 
@@ -52,6 +73,10 @@ export abstract class UiElement {
         const { x, y } = this.getAbsolutePosition()
         return new Rect(x, y, this.rect.width, this.rect.height);
     }
+
+    protected onHoverEnter(): void { }
+    
+    protected onHoverExit(): void { }
 }
 
 export class Button extends UiElement {
@@ -80,7 +105,7 @@ export class Button extends UiElement {
 }
 
 export class LabelButton extends Button {
-    constructor(rect: Rect, parent: Rect | null = null, onClick: () => void, private label: string, private fontSize: number = 16, private color: string = 'black', protected backgroundColor: string = 'lightgray') {
+    constructor(rect: Rect, parent: Rect | null = null, onClick: () => void, private label: () => string, private fontSize: number = 16, private color: string = 'black', protected backgroundColor: string = 'lightgray') {
         super(rect, parent, onClick);
     }
 
@@ -89,7 +114,7 @@ export class LabelButton extends Button {
         const pos = this.getAbsolutePosition();
         ctx.fillStyle = this.color;
         ctx.font = `${this.fontSize}px Arial`;
-        ctx.fillText(this.label, pos.x + 10, pos.y + this.rect.height / 2 + 6);
+        ctx.fillText(this.label(), pos.x + 10, pos.y + this.rect.height / 2 + 6);
     }
 }
 
@@ -130,7 +155,7 @@ export class Panel extends UiElement {
 }
 
 export class Label extends UiElement {
-    constructor(rect: Rect, parent: Rect | null = null, private text: string, private fontSize: number = 16, private color: string = 'black') {
+    constructor(rect: Rect, parent: Rect | null = null, private text: () => string, private fontSize: number = 16, private color: string = 'black') {
         super(rect, parent);
     }
 
@@ -138,14 +163,14 @@ export class Label extends UiElement {
         const pos = this.getAbsolutePosition();
         ctx.fillStyle = this.color;
         ctx.font = `${this.fontSize}px Arial`;
-        ctx.fillText(this.text, pos.x, pos.y + this.fontSize);        
+        ctx.fillText(this.text(), pos.x, pos.y + this.fontSize);        
     }
 
     setText(newText: string): void {
-        this.text = newText;
+        this.text = () => newText;
     }
 
     getText(): string {
-        return this.text;
+        return this.text();
     }
 }

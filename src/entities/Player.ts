@@ -6,8 +6,12 @@ export default class Player {
     public placingTurret: Turret | null = null;
 
     constructor(private money: number, private lives: number) {
-        EventBusInstance.on('enemyKilled', ({ enemy }) => {
-            this.addMoney(enemy.bounty);
+        EventBusInstance.on('enemyKilled', ({bounty}) => {
+            this.addMoney(bounty);
+        });
+
+        EventBusInstance.on('enemyEscaped', () => {
+            this.deductLife();
         });
     }
 
@@ -17,13 +21,11 @@ export default class Player {
 
     addMoney(amount: number): void {
         this.money += amount;
-        EventBusInstance.emit('moneyChanged');
     }
 
     deductMoney(amount: number): boolean {        
         if (this.money >= amount) {
             this.money -= amount;
-            EventBusInstance.emit('moneyChanged');
             return true;
         }
         return false;
@@ -36,7 +38,6 @@ export default class Player {
     deductLife(): void {
         if (this.lives > 0) {
             this.lives -= 1;
-            EventBusInstance.emit('lifeChanged');
         }
     }
 }
