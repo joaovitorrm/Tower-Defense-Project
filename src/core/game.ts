@@ -17,6 +17,8 @@ export default class Game {
 
     constructor(canvas: HTMLCanvasElement) {
 
+    
+
         this.inputManager = new InputManager(canvas);
 
         this.mapManager.setMap(0);
